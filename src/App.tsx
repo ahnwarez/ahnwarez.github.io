@@ -21,7 +21,7 @@ import { makeCache } from './cache'
 
 export function App() {
   const [s, setS] = useState(4)
-  const [E, setE] = useState(1)
+  const [E, setE] = useState(3)
   const [b, setb] = useState(4)
   const [selectedExample, setSelectedExample] = useState('yi')
   const [trace, setTrace] = useState([
@@ -183,27 +183,35 @@ export function App() {
               </TableBody>
             </Table>
           </div>
-          <div id="sets" className="space-y-2 overflow-auto h-48">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-20">Set Index</TableHead>
-                  <TableHead className="w-10">Valid</TableHead>
-                  <TableHead>Tag</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {cache.sets.map((s, i) => (
-                  <TableRow>
-                    <TableCell className="text-green-600 text-right">
-                      {i.toString(2).padStart(5, '0')}
-                    </TableCell>
-                    <TableCell className="text-pink-600">1</TableCell>
-                    <TableCell className="text-amber-600">1111</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <div
+            id="sets"
+            className="flex flex-col overflow-auto h-96 bg-card rounded-lg p-4"
+          >
+            {cache.sets.map((s, i) => (
+              <div key={i} className="flex gap-x-8 items-center border p-2">
+                <p className="w-24 text-green-600">
+                  {i.toString(2).padStart(Number(E) + 2, '0')}
+                </p>
+                <div id="line">
+                  {s.map((line) => (
+                    <div id="line" className="space-x-2">
+                      <span
+                        className={
+                          line.valid
+                            ? 'text-foreground'
+                            : 'text-muted-foreground'
+                        }
+                      >
+                        {line.valid ? '1' : '0'}
+                      </span>
+                      <span className="text-amber-600">
+                        {line.tag.toString(2).padStart(Number(E) + 2, '0')}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
