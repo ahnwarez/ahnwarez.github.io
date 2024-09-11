@@ -17,17 +17,43 @@ import {
   TableBody,
 } from './components/ui/table'
 import { PlayIcon, RewindIcon } from 'lucide-react'
-import { getTrace } from './traces'
+import { getTrace, parse } from './traces'
 import { useState } from 'react'
 
 export function App() {
   const [s, sets] = useState(4)
   const [E, setE] = useState(1)
   const [b, setb] = useState(4)
+  const [selectedExample, setSelectedExample] = useState('yi')
+  const [trace, setTrace] = useState([
+    { instruction: 'L', address: 0xff, tag: 0n, setIndex: 0n, B: 0n },
+  ])
+
   function handleTraceExampleClick(
     exampleName: 'yi' | 'yi2' | 'trans' | 'dave',
   ) {
-    console.log(getTrace(exampleName))
+    const text = getTrace(exampleName)
+    const trace = parse(text, s, b)
+    setTrace(() => trace)
+  }
+
+  function handleChange_s(values: number[]) {
+    const s = values[0]
+    sets(() => s)
+    const text = getTrace(selectedExample)
+    const trace = parse(text, s, b)
+    setTrace(() => trace)
+  }
+  function handleChange_E(values: number[]) {
+    const E = values[0]
+    setE(() => E)
+  }
+  function handleChange_b(values: number[]) {
+    const b = values[0]
+    setb(() => b)
+    const text = getTrace(selectedExample)
+    const trace = parse(text, s, b)
+    setTrace(() => trace)
   }
 
   return (
@@ -35,32 +61,19 @@ export function App() {
       <div className="flex flex-col gap-y-4">
         <div className="space-y-4">
           <div className="space-x-4">
-            <Button
-              variant="link"
-              onClick={() => handleTraceExampleClick('yi')}
-            >
+            <Button variant="link" onClick={() => setSelectedExample('yi')}>
               yi.trace
             </Button>
-            <Button
-              variant="link"
-              onClick={() => handleTraceExampleClick('yi2')}
-            >
+            <Button variant="link" onClick={() => setSelectedExample('yi2')}>
               yi2.trace
             </Button>
-            <Button
-              variant="link"
-              onClick={() => handleTraceExampleClick('trans')}
-            >
+            <Button variant="link" onClick={() => setSelectedExample('trans')}>
               trans.trace
             </Button>
-            <Button
-              variant="link"
-              onClick={() => handleTraceExampleClick('dave')}
-            >
+            <Button variant="link" onClick={() => setSelectedExample('dave')}>
               dave.trace
             </Button>
           </div>
-          <Input type="file" />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Card id="parameters">
@@ -75,12 +88,10 @@ export function App() {
                   B = 2<sup>b</sup>
                 </p>
                 <div>
-                  <pre>
-                    <code>
-                      C = S * E * B ={' '}
-                      <span className="text-foreground">{s * E * b} bytes</span>
-                    </code>
-                  </pre>
+                  <code>
+                    C = S * E * B ={' '}
+                    <span className="text-foreground">{s * E * b} bytes</span>
+                  </code>
                 </div>
               </CardDescription>
             </CardHeader>
@@ -95,7 +106,7 @@ export function App() {
                   min={1}
                   max={10}
                   value={[s]}
-                  onValueChange={(values) => sets(values[0])}
+                  onValueChange={handleChange_s}
                 />
               </div>
               <div className="flex flex-col gap-y-1">
@@ -107,6 +118,7 @@ export function App() {
                   step={1}
                   min={1}
                   max={10}
+                  value={[E]}
                   onValueChange={(values) => setE(values[0])}
                 />
               </div>
@@ -119,7 +131,8 @@ export function App() {
                   step={1}
                   min={1}
                   max={10}
-                  onValueChange={(values) => setb(values[0])}
+                  value={[b]}
+                  onValueChange={handleChange_b}
                 />
               </div>
             </CardContent>
@@ -148,94 +161,24 @@ export function App() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell className="text-foreground size-8"> →</TableCell>
-                  <TableCell> L</TableCell>
-                  <TableCell className="text-right">0x54C</TableCell>
-                  <TableCell className="text-amber-600">0000</TableCell>
-                  <TableCell className="text-green-600">1000</TableCell>
-                  <TableCell className="text-zinc-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-foreground size-8"> →</TableCell>
-                  <TableCell> L</TableCell>
-                  <TableCell className="text-right">0x54C</TableCell>
-                  <TableCell className="text-amber-600">0000</TableCell>
-                  <TableCell className="text-green-600">1000</TableCell>
-                  <TableCell className="text-zinc-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-foreground size-8"> →</TableCell>
-                  <TableCell> L</TableCell>
-                  <TableCell className="text-right">0x54C</TableCell>
-                  <TableCell className="text-amber-600">0000</TableCell>
-                  <TableCell className="text-green-600">1000</TableCell>
-                  <TableCell className="text-zinc-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-foreground size-8"> →</TableCell>
-                  <TableCell> L</TableCell>
-                  <TableCell className="text-right">0x54C</TableCell>
-                  <TableCell className="text-amber-600">0000</TableCell>
-                  <TableCell className="text-green-600">1000</TableCell>
-                  <TableCell className="text-zinc-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-foreground size-8"> →</TableCell>
-                  <TableCell> L</TableCell>
-                  <TableCell className="text-right">0x54C</TableCell>
-                  <TableCell className="text-amber-600">0000</TableCell>
-                  <TableCell className="text-green-600">1000</TableCell>
-                  <TableCell className="text-zinc-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-foreground size-8"> →</TableCell>
-                  <TableCell> L</TableCell>
-                  <TableCell className="text-right">0x54C</TableCell>
-                  <TableCell className="text-amber-600">0000</TableCell>
-                  <TableCell className="text-green-600">1000</TableCell>
-                  <TableCell className="text-zinc-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-foreground size-8"> →</TableCell>
-                  <TableCell> L</TableCell>
-                  <TableCell className="text-right">0x54C</TableCell>
-                  <TableCell className="text-amber-600">0000</TableCell>
-                  <TableCell className="text-green-600">1000</TableCell>
-                  <TableCell className="text-zinc-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-foreground size-8"> →</TableCell>
-                  <TableCell> L</TableCell>
-                  <TableCell className="text-right">0x54C</TableCell>
-                  <TableCell className="text-amber-600">0000</TableCell>
-                  <TableCell className="text-green-600">1000</TableCell>
-                  <TableCell className="text-zinc-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-foreground size-8"> →</TableCell>
-                  <TableCell> L</TableCell>
-                  <TableCell className="text-right">0x54C</TableCell>
-                  <TableCell className="text-amber-600">0000</TableCell>
-                  <TableCell className="text-green-600">1000</TableCell>
-                  <TableCell className="text-zinc-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-foreground size-8"> →</TableCell>
-                  <TableCell> L</TableCell>
-                  <TableCell className="text-right">0x54C</TableCell>
-                  <TableCell className="text-amber-600">0000</TableCell>
-                  <TableCell className="text-green-600">1000</TableCell>
-                  <TableCell className="text-zinc-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-foreground size-8"> →</TableCell>
-                  <TableCell> L</TableCell>
-                  <TableCell className="text-right">0x54C</TableCell>
-                  <TableCell className="text-amber-600">0000</TableCell>
-                  <TableCell className="text-green-600">1000</TableCell>
-                  <TableCell className="text-zinc-600">1111</TableCell>
-                </TableRow>
+                {trace.map((t) => (
+                  <TableRow key={t.address}>
+                    <TableCell className="text-foreground size-8"> →</TableCell>
+                    <TableCell> {t.instruction}</TableCell>
+                    <TableCell className="text-right">
+                      0x{t.address.toString(16)}
+                    </TableCell>
+                    <TableCell className="text-amber-600">
+                      {t.tag.toString(2)}
+                    </TableCell>
+                    <TableCell className="text-green-600">
+                      {t.setIndex.toString(2)}
+                    </TableCell>
+                    <TableCell className="text-zinc-600">
+                      {t.B.toString(2)}
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>
