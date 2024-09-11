@@ -17,17 +17,48 @@ import {
   TableBody,
 } from './components/ui/table'
 import { PlayIcon, RewindIcon } from 'lucide-react'
+import { getTrace } from './traces'
+import { useState } from 'react'
 
 export function App() {
+  const [s, sets] = useState(4)
+  const [E, setE] = useState(1)
+  const [b, setb] = useState(4)
+  function handleTraceExampleClick(
+    exampleName: 'yi' | 'yi2' | 'trans' | 'dave',
+  ) {
+    console.log(getTrace(exampleName))
+  }
+
   return (
     <div className="p-4">
       <div className="flex flex-col gap-y-4">
         <div className="space-y-4">
           <div className="space-x-4">
-            <Button variant="link">yi.trace</Button>
-            <Button variant="link">yi2.trace</Button>
-            <Button variant="link">trans.trace</Button>
-            <Button variant="link">dave.trace</Button>
+            <Button
+              variant="link"
+              onClick={() => handleTraceExampleClick('yi')}
+            >
+              yi.trace
+            </Button>
+            <Button
+              variant="link"
+              onClick={() => handleTraceExampleClick('yi2')}
+            >
+              yi2.trace
+            </Button>
+            <Button
+              variant="link"
+              onClick={() => handleTraceExampleClick('trans')}
+            >
+              trans.trace
+            </Button>
+            <Button
+              variant="link"
+              onClick={() => handleTraceExampleClick('dave')}
+            >
+              dave.trace
+            </Button>
           </div>
           <Input type="file" />
         </div>
@@ -45,7 +76,10 @@ export function App() {
                 </p>
                 <div>
                   <pre>
-                    <code>C = S * E * B = 16 bytes</code>
+                    <code>
+                      C = S * E * B ={' '}
+                      <span className="text-foreground">{s * E * b} bytes</span>
+                    </code>
                   </pre>
                 </div>
               </CardDescription>
@@ -54,23 +88,39 @@ export function App() {
               <div className="flex flex-col gap-y-1">
                 <div className="flex justify-between">
                   <label>s</label>
-                  <p>4</p>
+                  <p>{s}</p>
                 </div>
-                <Slider step={1} min={1} max={10} defaultValue={[4]} />
+                <Slider
+                  step={1}
+                  min={1}
+                  max={10}
+                  value={[s]}
+                  onValueChange={(values) => sets(values[0])}
+                />
               </div>
               <div className="flex flex-col gap-y-1">
                 <div className="flex justify-between">
                   <label>E</label>
-                  <p>1</p>
+                  <p>{E}</p>
                 </div>
-                <Slider step={1} min={1} max={10} defaultValue={[1]} />
+                <Slider
+                  step={1}
+                  min={1}
+                  max={10}
+                  onValueChange={(values) => setE(values[0])}
+                />
               </div>
               <div className="flex flex-col gap-y-1">
                 <div className="flex justify-between">
                   <label>b</label>
-                  <p>4</p>
+                  <p>{b}</p>
                 </div>
-                <Slider step={1} min={1} max={10} defaultValue={[4]} />
+                <Slider
+                  step={1}
+                  min={1}
+                  max={10}
+                  onValueChange={(values) => setb(values[0])}
+                />
               </div>
             </CardContent>
           </Card>
@@ -78,7 +128,7 @@ export function App() {
         <div className="grid grid-cols-2 gap-4">
           <div id="controls" className="space-x-4 flex justify-end">
             <Button variant="default" className="space-x-2">
-              <PlayIcon /> <p>Play</p>
+              <PlayIcon /> <label>Play</label>
             </Button>
             <Button variant="default" className="space-x-2">
               <RewindIcon /> <p>Rewind</p>
