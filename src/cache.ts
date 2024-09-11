@@ -15,6 +15,7 @@ export function makeCache({ s, E, b }: { s: number; E: number; b: number }) {
     )
 
   return Object.freeze({
+    sets,
     getState,
     access,
   })
