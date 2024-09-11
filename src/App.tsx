@@ -1,6 +1,5 @@
 import { Button } from './components/ui/button'
 import { Slider } from './components/ui/slider'
-import { Input } from './components/ui/input'
 import {
   Card,
   CardContent,
@@ -16,18 +15,20 @@ import {
   TableCell,
   TableBody,
 } from './components/ui/table'
-import { PlayIcon, RewindIcon } from 'lucide-react'
 import { getTrace, parse } from './traces'
 import { useState } from 'react'
+import { makeCache } from './cache'
 
 export function App() {
-  const [s, sets] = useState(4)
+  const [s, setS] = useState(4)
   const [E, setE] = useState(1)
   const [b, setb] = useState(4)
   const [selectedExample, setSelectedExample] = useState('yi')
   const [trace, setTrace] = useState([
     { instruction: 'L', address: 0xff, tag: 0n, setIndex: 0n, B: 0n },
   ])
+
+  const cache = makeCache({ s, E, b })
 
   function handleTraceExampleClick(
     exampleName: 'yi' | 'yi2' | 'trans' | 'dave',
@@ -39,7 +40,7 @@ export function App() {
 
   function handleChange_s(values: number[]) {
     const s = values[0]
-    sets(() => s)
+    setS(() => s)
     const text = getTrace(selectedExample)
     const trace = parse(text, s, b)
     setTrace(() => trace)
@@ -119,7 +120,7 @@ export function App() {
                   min={1}
                   max={10}
                   value={[E]}
-                  onValueChange={(values) => setE(values[0])}
+                  onValueChange={handleChange_E}
                 />
               </div>
               <div className="flex flex-col gap-y-1">
@@ -192,61 +193,15 @@ export function App() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell className="text-green-600">0000</TableCell>
-                  <TableCell className="text-pink-600">1</TableCell>
-                  <TableCell className="text-amber-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-green-600">0000</TableCell>
-                  <TableCell className="text-pink-600">1</TableCell>
-                  <TableCell className="text-amber-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-green-600">0000</TableCell>
-                  <TableCell className="text-pink-600">1</TableCell>
-                  <TableCell className="text-amber-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-green-600">0000</TableCell>
-                  <TableCell className="text-pink-600">1</TableCell>
-                  <TableCell className="text-amber-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-green-600">0000</TableCell>
-                  <TableCell className="text-pink-600">1</TableCell>
-                  <TableCell className="text-amber-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-green-600">0000</TableCell>
-                  <TableCell className="text-pink-600">1</TableCell>
-                  <TableCell className="text-amber-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-green-600">0000</TableCell>
-                  <TableCell className="text-pink-600">1</TableCell>
-                  <TableCell className="text-amber-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-green-600">0000</TableCell>
-                  <TableCell className="text-pink-600">1</TableCell>
-                  <TableCell className="text-amber-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-green-600">0000</TableCell>
-                  <TableCell className="text-pink-600">1</TableCell>
-                  <TableCell className="text-amber-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-green-600">0000</TableCell>
-                  <TableCell className="text-pink-600">1</TableCell>
-                  <TableCell className="text-amber-600">1111</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-green-600">0000</TableCell>
-                  <TableCell className="text-pink-600">1</TableCell>
-                  <TableCell className="text-amber-600">1111</TableCell>
-                </TableRow>
+                {cache.sets.map((s, i) => (
+                  <TableRow>
+                    <TableCell className="text-green-600 text-right">
+                      {i.toString(2).padStart(5, '0')}
+                    </TableCell>
+                    <TableCell className="text-pink-600">1</TableCell>
+                    <TableCell className="text-amber-600">1111</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>
