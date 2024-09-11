@@ -57,7 +57,7 @@ export function App() {
   }
 
   return (
-    <div className="p-4">
+    <div className="p-4 text-xl">
       <div className="flex flex-col gap-y-4">
         <div className="space-y-4">
           <div className="space-x-4">
@@ -148,7 +148,12 @@ export function App() {
             </Button>
           </div>
 
-          <div id="addresses" className="col-start-1 overflow-auto h-48">
+          <div className="flex gap-2">
+            <p>Hits: 25</p>
+            <p>Misses: 25</p>
+            <p>Eviction: 25</p>
+          </div>
+          <div id="addresses" className=" overflow-auto h-48">
             <Table>
               <TableHeader>
                 <TableRow>
