@@ -140,12 +140,7 @@ export function App() {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div id="controls" className="space-x-4 flex justify-end">
-            <Button variant="default" className="space-x-2">
-              <PlayIcon /> <label>Play</label>
-            </Button>
-            <Button variant="default" className="space-x-2">
-              <RewindIcon /> <p>Rewind</p>
-            </Button>
+            <Slider min={1} max={100} step={1} defaultValue={[1]} />
           </div>
 
           <div className="flex gap-2">
