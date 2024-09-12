@@ -20,22 +20,18 @@ export function App() {
   const trace = parse(s, b, getTrace(selectedExample))
 
   function handleChange_s(values: number[]) {
-    const s = values[0]
-    setS(() => s)
+    setS(() => values[0])
   }
   function handleChange_E(values: number[]) {
-    const E = values[0]
-    setE(() => E)
+    setE(() => values[0])
   }
 
   function handleChange_b(values: number[]) {
-    const b = values[0]
-    setb(() => b)
+    setb(() => values[0])
   }
 
   function handleChangeWord(value: string) {
-    const wordSize = Number(value)
-    setWord(() => wordSize)
+    setWord(() => Number(value))
   }
   function handleChangeSelectedExampe(name: string) {
     setSelectedExample(() => name)
