@@ -29,40 +29,51 @@ export function App() {
   const [s, setS] = useState(4)
   const [E, setE] = useState(1)
   const [b, setb] = useState(4)
-  const [trace, setTrace] = useState(
-    parse(getTrace(selectedExample), s, b, word),
-  )
   const [pc, setPC] = useState(0)
   const [hits, setHits] = useState(0)
   const [misses, setMisses] = useState(0)
   const [evictions, setEvictions] = useState(0)
 
-  const sets = Array(2 ** s)
-    .fill(() => 0)
-    .map(() =>
-      Array(E)
-        .fill(() => 0)
-        .map(() => ({
-          valid: false,
-          tag: 0n,
-        })),
-    )
+  const [sets, setSets] = useState(
+    Array(2 ** s)
+      .fill(() => 0)
+      .map(() =>
+        Array(E)
+          .fill(() => 0)
+          .map(() => ({
+            valid: false,
+            tag: 0n,
+          })),
+      ),
+  )
+
+  const trace = parse(getTrace(selectedExample), s, b)
 
   useEffect(() => {
     let hits = 0
     let misses = 0
     let evictions = 0
     trace.slice(0, pc).forEach((trace) => {
-      const { hit, eviction, miss } = getCache({
+      const {
+        hit,
+        eviction,
+        miss,
+        sets: newSets,
+      } = getCache({
         address: trace.address,
         sets,
         s,
         E,
         b,
       })
-
+      setSets(() => newSets)
       if (trace.instruction === 'M') {
-        const { hit, eviction, miss } = getCache({
+        const {
+          hit,
+          eviction,
+          miss,
+          sets: newSets,
+        } = getCache({
           address: trace.address,
           sets,
           s,
@@ -72,6 +83,7 @@ export function App() {
         hits += hit
         misses += miss
         evictions += eviction
+        setSets(() => newSets)
       }
       hits += hit
       misses += miss
@@ -86,11 +98,7 @@ export function App() {
   function handleChange_s(values: number[]) {
     const s = values[0]
     setS(() => s)
-    const text = getTrace(selectedExample)
-    const trace = parse(text, s, b, word)
-    setTrace(() => trace)
   }
-
   function handleChange_E(values: number[]) {
     const E = values[0]
     setE(() => E)
@@ -99,9 +107,6 @@ export function App() {
   function handleChange_b(values: number[]) {
     const b = values[0]
     setb(() => b)
-    const text = getTrace(selectedExample)
-    const trace = parse(text, s, b, word)
-    setTrace(() => trace)
   }
 
   function handlePC(values: number[]) {
@@ -111,6 +116,10 @@ export function App() {
   function handleChangeWord(value: string) {
     const wordSize = Number(value)
     setWord(() => wordSize)
+  }
+  function handleChangeSelectedExampe(name: string) {
+    setSelectedExample(() => name)
+    setPC(() => 0)
   }
 
   const S = 1 << s
@@ -122,16 +131,28 @@ export function App() {
       <div className="flex flex-col gap-y-4">
         <div className="space-y-4">
           <div className="space-x-4">
-            <Button variant="link" onClick={() => setSelectedExample('yi')}>
+            <Button
+              variant="link"
+              onClick={() => handleChangeSelectedExampe('yi')}
+            >
               yi.trace
             </Button>
-            <Button variant="link" onClick={() => setSelectedExample('yi2')}>
+            <Button
+              variant="link"
+              onClick={() => handleChangeSelectedExampe('yi2')}
+            >
               yi2.trace
             </Button>
-            <Button variant="link" onClick={() => setSelectedExample('trans')}>
+            <Button
+              variant="link"
+              onClick={() => handleChangeSelectedExampe('trans')}
+            >
               trans.trace
             </Button>
-            <Button variant="link" onClick={() => setSelectedExample('dave')}>
+            <Button
+              variant="link"
+              onClick={() => handleChangeSelectedExampe('dave')}
+            >
               dave.trace
             </Button>
           </div>
@@ -147,16 +168,20 @@ export function App() {
                   onValueChange={handleChangeWord}
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="16" id="r1" />
-                    <Label htmlFor="r1">16</Label>
+                    <RadioGroupItem value="8" id="r8" />
+                    <Label htmlFor="r8">8</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="32" id="r2" />
-                    <Label htmlFor="r2">32</Label>
+                    <RadioGroupItem value="16" id="r16" />
+                    <Label htmlFor="r16">16</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="64" id="r3" />
-                    <Label htmlFor="r3">64</Label>
+                    <RadioGroupItem value="32" id="r32" />
+                    <Label htmlFor="r32">32</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="64" id="r64" />
+                    <Label htmlFor="r64">64</Label>
                   </div>
                 </RadioGroup>
               </div>
@@ -248,7 +273,7 @@ export function App() {
                   <TableHead>Address (Binary)</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
+              <TableBody className="font-mono">
                 {trace.map((t, i) => (
                   <TableRow key={t.address}>
                     <TableCell className="text-foreground size-8">
@@ -260,7 +285,7 @@ export function App() {
                     </TableCell>
                     <TableCell className="text-left">
                       <span className="text-amber-600">
-                        {t.tag.toString(2).padStart(t.tagBits, '0')}
+                        {t.tag.toString(2).padStart(word, '0')}
                       </span>
                       <span className="text-green-600">
                         {t.setIndex.toString(2).padStart(s, '0')}
@@ -280,7 +305,10 @@ export function App() {
               </TableBody>
             </Table>
           </div>
-          <div id="sets" className="flex flex-col bg-card rounded-lg p-4">
+          <div
+            id="sets"
+            className="flex flex-col bg-card rounded-lg p-4 text-sm font-mono"
+          >
             {sets.map((lines, i) => (
               <div key={i} className="flex gap-x-8 items-center border p-2 m-2">
                 <p className="w-24 text-green-600">
