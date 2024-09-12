@@ -7,7 +7,47 @@ export function getTrace(exampleName: string) {
  L 110,1
  L 210,1
  M 12,1`,
-    yi2: ' M 1234,1',
+    yi2: ` S 00602264,1
+ L 00602260,4
+ L 0060225c,4
+ L 00602400,8
+ S 7fefe05a8,8
+ S 7fefe05a0,8
+ S 7fefe058c,4
+ S 7fefe0588,4
+ S 7fefe0580,8
+ S 7fefe0578,8
+ L 7fefe058c,4
+ S 7fefe0570,4
+ L 7fefe0588,4
+ S 7fefe0574,4
+ S 7fefe0590,4
+ L 7fefe0590,4
+ L 7fefe0588,4
+ S 7fefe0594,4
+ L 7fefe0594,4
+ L 7fefe058c,4
+ L 7fefe0590,4
+ S 7fefe0598,4
+ L 7fefe0590,4
+ L 7fefe0598,4
+ L 7fefe0598,4
+ L 7fefe0588,4
+ L 7fefe0594,4
+ S 7fefe059c,4
+ L 7fefe0594,4
+ L 7fefe059c,4
+ L 7fefe059c,4
+ L 7fefe058c,4
+ L 7fefe059c,4
+ L 7fefe0574,4
+ L 7fefe0578,8
+ L 7fefe0598,4
+ L 7fefe0598,4
+ L 7fefe0570,4
+ L 7fefe0580,8
+ L 7fefe059c,4
+`,
   } as const
 
   const traceFound = traceExamples[exampleName]

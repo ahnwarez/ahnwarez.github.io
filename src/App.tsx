@@ -24,7 +24,7 @@ import { useEffect, useState } from 'react'
 import { getCache } from './cache'
 
 export function App() {
-  const [selectedExample, setSelectedExample] = useState('yi')
+  const [selectedExample, setSelectedExample] = useState('yi2')
   const [word, setWord] = useState(16)
   const [s, setS] = useState(4)
   const [E, setE] = useState(1)
@@ -81,7 +81,7 @@ export function App() {
     setHits(() => hits)
     setMisses(() => misses)
     setEvictions(() => evictions)
-  }, [s, E, b, pc])
+  }, [s, E, b, pc, selectedExample])
 
   function handleChange_s(values: number[]) {
     const s = values[0]
@@ -113,6 +113,10 @@ export function App() {
     setWord(() => wordSize)
   }
 
+  const S = 1 << s
+  const B = 1 << b
+  const C = S * E * B
+
   return (
     <div className="p-4 text-xl">
       <div className="flex flex-col gap-y-4">
@@ -134,25 +138,7 @@ export function App() {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Card id="parameters">
-            <CardHeader>
-              <CardTitle>Cache size</CardTitle>
-              <CardDescription>
-                <p>
-                  S = 2<sup>s</sup>
-                </p>
-                <p>E: number of cache lines</p>
-                <p>
-                  B = 2<sup>b</sup>
-                </p>
-                <div>
-                  <code>
-                    C = S * E * B ={' '}
-                    <span className="text-foreground">{s * E * b} bytes</span>
-                  </code>
-                </div>
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 pt-4">
               <div>
                 <label>Word size</label>
                 <RadioGroup
@@ -215,6 +201,26 @@ export function App() {
               </div>
             </CardContent>
           </Card>
+          <Card id="parameters">
+            <CardHeader>
+              <CardTitle>Cache size</CardTitle>
+              <CardDescription>
+                <p>
+                  S = 2<sup>s</sup>
+                </p>
+                <p>E: number of cache lines</p>
+                <p>
+                  B = 2<sup>b</sup>
+                </p>
+                <div>
+                  <code>
+                    C = S * E * B ={' '}
+                    <span className="text-foreground">{C} bytes</span>
+                  </code>
+                </div>
+              </CardDescription>
+            </CardHeader>
+          </Card>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div id="controls" className="space-x-4 flex justify-end">
@@ -238,10 +244,8 @@ export function App() {
                 <TableRow>
                   <TableHead>{''}</TableHead>
                   <TableHead>Inst.</TableHead>
-                  <TableHead>Address</TableHead>
-                  <TableHead>Tag</TableHead>
-                  <TableHead>Set Index</TableHead>
-                  <TableHead>B</TableHead>
+                  <TableHead>Address (Hex)</TableHead>
+                  <TableHead>Address (Binary)</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -251,17 +255,19 @@ export function App() {
                       {i === pc ? '→' : ''}
                     </TableCell>
                     <TableCell> {t.instruction}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-left">
                       0x{t.address.toString(16)}
                     </TableCell>
-                    <TableCell className="text-amber-600">
-                      {t.tag.toString(2).padStart(t.tagBits, '0')}
-                    </TableCell>
-                    <TableCell className="text-green-600">
-                      {t.setIndex.toString(2).padStart(s, '0')}
-                    </TableCell>
-                    <TableCell className="text-zinc-600">
-                      {t.B.toString(2).padStart(b, '0')}
+                    <TableCell className="text-left">
+                      <span className="text-amber-600">
+                        {t.tag.toString(2).padStart(t.tagBits, '0')}
+                      </span>
+                      <span className="text-green-600">
+                        {t.setIndex.toString(2).padStart(s, '0')}
+                      </span>
+                      <span className="text-muted-foreground">
+                        {t.B.toString(2).padStart(b, '0')}
+                      </span>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -276,7 +282,7 @@ export function App() {
           </div>
           <div id="sets" className="flex flex-col bg-card rounded-lg p-4">
             {sets.map((lines, i) => (
-              <div key={i} className="flex gap-x-8 items-center border p-2">
+              <div key={i} className="flex gap-x-8 items-center border p-2 m-2">
                 <p className="w-24 text-green-600">
                   {i.toString(2).padStart(s, '0')}
                 </p>
@@ -295,6 +301,7 @@ export function App() {
                       <span className="text-amber-600">
                         {line.tag.toString(2).padStart(word - (s + b), '0')}
                       </span>
+                      <span className="text-muted-foreground">{B} bytes</span>
                     </div>
                   ))}
                 </div>
