@@ -3,25 +3,11 @@ import { Slider } from './components/ui/slider'
 import { Label } from './components/ui/label'
 import { RadioGroup, RadioGroupItem } from './components/ui/radio-group'
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from './components/ui/card'
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableCell,
-  TableBody,
-} from './components/ui/table'
-
+import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card'
+import { useState } from 'react'
+import { TraceView } from './components/traceView'
+import { CacheView } from './components/cacheView'
 import { getTrace, parse } from './traces'
-import { useEffect, useState } from 'react'
-import { getCache } from './cache'
 
 export function App() {
   const [selectedExample, setSelectedExample] = useState('yi2')
@@ -30,70 +16,8 @@ export function App() {
   const [E, setE] = useState(1)
   const [b, setb] = useState(4)
   const [pc, setPC] = useState(0)
-  const [hits, setHits] = useState(0)
-  const [misses, setMisses] = useState(0)
-  const [evictions, setEvictions] = useState(0)
 
-  const [sets, setSets] = useState(
-    Array(2 ** s)
-      .fill(() => 0)
-      .map(() =>
-        Array(E)
-          .fill(() => 0)
-          .map(() => ({
-            valid: false,
-            tag: 0n,
-          })),
-      ),
-  )
-
-  const trace = parse(getTrace(selectedExample), s, b)
-
-  useEffect(() => {
-    let hits = 0
-    let misses = 0
-    let evictions = 0
-    trace.slice(0, pc).forEach((trace) => {
-      const {
-        hit,
-        eviction,
-        miss,
-        sets: newSets,
-      } = getCache({
-        address: trace.address,
-        sets,
-        s,
-        E,
-        b,
-      })
-      setSets(() => newSets)
-      if (trace.instruction === 'M') {
-        const {
-          hit,
-          eviction,
-          miss,
-          sets: newSets,
-        } = getCache({
-          address: trace.address,
-          sets,
-          s,
-          E,
-          b,
-        })
-        hits += hit
-        misses += miss
-        evictions += eviction
-        setSets(() => newSets)
-      }
-      hits += hit
-      misses += miss
-      evictions += eviction
-    })
-
-    setHits(() => hits)
-    setMisses(() => misses)
-    setEvictions(() => evictions)
-  }, [s, E, b, pc, selectedExample])
+  const trace = parse(s, b, getTrace(selectedExample))
 
   function handleChange_s(values: number[]) {
     const s = values[0]
@@ -109,17 +33,12 @@ export function App() {
     setb(() => b)
   }
 
-  function handlePC(values: number[]) {
-    const pc = values[0]
-    setPC(() => pc)
-  }
   function handleChangeWord(value: string) {
     const wordSize = Number(value)
     setWord(() => wordSize)
   }
   function handleChangeSelectedExampe(name: string) {
     setSelectedExample(() => name)
-    setPC(() => 0)
   }
 
   const S = 1 << s
@@ -188,7 +107,7 @@ export function App() {
               <div className="flex flex-col gap-y-1">
                 <div className="flex justify-between">
                   <label>s</label>
-                  <p>{s}</p>
+                  {s}
                 </div>
                 <Slider
                   step={1}
@@ -201,7 +120,7 @@ export function App() {
               <div className="flex flex-col gap-y-1">
                 <div className="flex justify-between">
                   <label>E</label>
-                  <p>{E}</p>
+                  {E}
                 </div>
                 <Slider
                   step={1}
@@ -214,7 +133,7 @@ export function App() {
               <div className="flex flex-col gap-y-1">
                 <div className="flex justify-between">
                   <label>b</label>
-                  <p>{b}</p>
+                  {b}
                 </div>
                 <Slider
                   step={1}
@@ -229,7 +148,7 @@ export function App() {
           <Card id="parameters">
             <CardHeader>
               <CardTitle>Cache size</CardTitle>
-              <CardDescription>
+              <CardContent className="text-muted-foreground">
                 <p>
                   S = 2<sup>s</sup>
                 </p>
@@ -243,99 +162,21 @@ export function App() {
                     <span className="text-foreground">{C} bytes</span>
                   </code>
                 </div>
-              </CardDescription>
+              </CardContent>
             </CardHeader>
           </Card>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div id="controls" className="space-x-4 flex justify-end">
-            <Slider
-              min={0}
-              max={trace.length}
-              step={1}
-              value={[pc]}
-              onValueChange={handlePC}
-            />
-          </div>
-
-          <div className="flex gap-2">
-            <p>Hits: {hits}</p>
-            <p>Misses: {misses}</p>
-            <p>Eviction: {evictions}</p>
-          </div>
-          <div id="addresses" className=" overflow-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{''}</TableHead>
-                  <TableHead>Inst.</TableHead>
-                  <TableHead>Address (Hex)</TableHead>
-                  <TableHead>Address (Binary)</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody className="font-mono">
-                {trace.map((t, i) => (
-                  <TableRow key={t.address}>
-                    <TableCell className="text-foreground size-8">
-                      {i === pc ? '→' : ''}
-                    </TableCell>
-                    <TableCell> {t.instruction}</TableCell>
-                    <TableCell className="text-left">
-                      0x{t.address.toString(16)}
-                    </TableCell>
-                    <TableCell className="text-left">
-                      <span className="text-amber-600">
-                        {t.tag.toString(2).padStart(word, '0')}
-                      </span>
-                      <span className="text-green-600">
-                        {t.setIndex.toString(2).padStart(s, '0')}
-                      </span>
-                      <span className="text-muted-foreground">
-                        {t.B.toString(2).padStart(b, '0')}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                <TableRow>
-                  <TableCell className="text-foreground size-8">
-                    {trace.length === pc ? '→' : ''}
-                  </TableCell>
-                  <TableCell className="text-zinc-600">End</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </div>
-          <div
-            id="sets"
-            className="flex flex-col bg-card rounded-lg p-4 text-sm font-mono"
-          >
-            {sets.map((lines, i) => (
-              <div key={i} className="flex gap-x-8 items-center border p-2 m-2">
-                <p className="w-24 text-green-600">
-                  {i.toString(2).padStart(s, '0')}
-                </p>
-                <div id="line">
-                  {lines.map((line, i) => (
-                    <div id="line" className="space-x-2" key={i}>
-                      <span
-                        className={
-                          line.valid
-                            ? 'text-foreground'
-                            : 'text-muted-foreground'
-                        }
-                      >
-                        {line.valid ? '1' : '0'}
-                      </span>
-                      <span className="text-amber-600">
-                        {line.tag.toString(2).padStart(word - (s + b), '0')}
-                      </span>
-                      <span className="text-muted-foreground">{B} bytes</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+        <div>
+          <TraceView trace={trace} pc={pc} s={s} b={b} word={word} />
+          <CacheView
+            trace={trace}
+            filename={selectedExample}
+            E={E}
+            s={s}
+            b={b}
+            B={B}
+            word={word}
+          />
         </div>
       </div>
     </div>

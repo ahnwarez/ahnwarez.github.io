@@ -20,7 +20,7 @@ export function getTrace(exampleName: string) {
   return traceFound
 }
 
-export function parse(text: string, s: number, b: number) {
+export function parse(s: number, b: number, text: string) {
   const lines = text.split('\n')
   const addresses = []
   let i = 0
