@@ -1,3 +1,4 @@
+import { parse } from '../traces'
 import {
   Table,
   TableBody,
@@ -12,13 +13,7 @@ interface TraceProps {
   word: number
   s: number
   b: number
-  trace: Array<{
-    address: number
-    instruction: string
-    tag: bigint
-    setIndex: bigint
-    B: bigint
-  }>
+  trace: ReturnType<typeof parse>
 }
 
 export function TraceView({ s, b, pc, word, trace }: TraceProps) {
@@ -30,11 +25,14 @@ export function TraceView({ s, b, pc, word, trace }: TraceProps) {
           <TableHead>Inst.</TableHead>
           <TableHead>Address (Hex)</TableHead>
           <TableHead>Address (Binary)</TableHead>
+          <TableHead>Hits</TableHead>
+          <TableHead>Misses</TableHead>
+          <TableHead>Evictions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody className="font-mono">
         {trace.map((t, i) => (
-          <TableRow key={t.address}>
+          <TableRow key={t.i}>
             <TableCell className="text-foreground size-8">
               {i === pc ? '→' : ''}
             </TableCell>
@@ -53,6 +51,9 @@ export function TraceView({ s, b, pc, word, trace }: TraceProps) {
                 {t.B.toString(2).padStart(b, '0')}
               </span>
             </TableCell>
+            <TableCell> {t.hit}</TableCell>
+            <TableCell> {t.miss}</TableCell>
+            <TableCell> {t.eviction}</TableCell>
           </TableRow>
         ))}
         <TableRow>

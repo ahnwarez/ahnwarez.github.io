@@ -1,9 +1,7 @@
-import { Slider } from '@radix-ui/react-slider'
-import { useEffect, useState } from 'react'
 import { parse } from '../traces'
-import { getCache } from '../cache'
+import { initSet } from '../App'
 
-type Trace = ReturnType<typeof parse>
+type Addresses = ReturnType<typeof parse>
 
 interface CacheViewProps {
   word: number
@@ -11,95 +9,28 @@ interface CacheViewProps {
   b: number
   B: number
   E: number
-  trace: Trace
+  pc: number
+  addresses: Addresses
+  sets: ReturnType<typeof initSet>
 }
 
-export function CacheView({ s, b, word, E, B, trace }: CacheViewProps) {
-  const [pc, setPC] = useState(0)
-  const [hits, setHits] = useState(0)
-  const [misses, setMisses] = useState(0)
-  const [evictions, setEvictions] = useState(0)
-
-  const [sets, setSets] = useState(
-    Array(2 ** s)
-      .fill(() => 0)
-      .map(() =>
-        Array(E)
-          .fill(() => 0)
-          .map(() => ({
-            valid: false,
-            tag: 0n,
-          })),
-      ),
+export function CacheView({ addresses, s, b, word, B, sets }: CacheViewProps) {
+  const summary = addresses.reduce(
+    (acc, v) => ({
+      hits: acc.hits + v.hit,
+      misses: acc.misses + v.miss,
+      evictions: acc.evictions + v.eviction,
+    }),
+    { hits: 0, misses: 0, evictions: 0 },
   )
-
-  useEffect(() => {
-    let hits = 0
-    let misses = 0
-    let evictions = 0
-    trace.slice(0, pc).forEach((trace) => {
-      const {
-        hit,
-        eviction,
-        miss,
-        sets: newSets,
-      } = getCache({
-        address: trace.address,
-        sets,
-        s,
-        E,
-        b,
-      })
-      setSets(() => newSets)
-      if (trace.instruction === 'M') {
-        const {
-          hit,
-          eviction,
-          miss,
-          sets: newSets,
-        } = getCache({
-          address: trace.address,
-          sets,
-          s,
-          E,
-          b,
-        })
-        hits += hit
-        misses += miss
-        evictions += eviction
-        setSets(() => newSets)
-      }
-      hits += hit
-      misses += miss
-      evictions += eviction
-    })
-
-    setHits(() => hits)
-    setMisses(() => misses)
-    setEvictions(() => evictions)
-  }, [s, E, b, pc])
-
-  function handlePC(values: number[]) {
-    const pc = values[0]
-    setPC(() => pc)
-  }
-
   return (
     <div className="flex flex-col">
-      <div id="controls" className="space-x-4 flex justify-end">
-        <Slider
-          min={0}
-          max={trace.length}
-          step={1}
-          value={[pc]}
-          onValueChange={handlePC}
-        />
-      </div>
-
       <div className="flex gap-2">
-        <p>Hits: {hits}</p>
-        <p>Misses: {misses}</p>
-        <p>Eviction: {evictions}</p>
+        <div className="flex gap-2">
+          <p>Hits {summary.hits}</p>
+          <p>Misses {summary.misses}</p>
+          <p>Evictions {summary.evictions}</p>
+        </div>
       </div>
       <div
         id="sets"

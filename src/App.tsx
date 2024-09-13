@@ -8,33 +8,95 @@ import { useState } from 'react'
 import { TraceView } from './components/traceView'
 import { CacheView } from './components/cacheView'
 import { getTrace, parse } from './traces'
+import { nextCache } from './cache'
+
+export function initSet({ s, E }: { s: number; E: number }) {
+  return Array(2 ** s)
+    .fill(() => 0)
+    .map(() =>
+      Array(E)
+        .fill(() => 0)
+        .map(() => ({
+          valid: false,
+          tag: 0n,
+        })),
+    )
+}
 
 export function App() {
-  const [selectedExample, setSelectedExample] = useState('yi2')
+  const [selectedExample, setSelectedExample] = useState<string>()
   const [word, setWord] = useState(16)
   const [s, setS] = useState(4)
   const [E, setE] = useState(1)
   const [b, setb] = useState(4)
-  const [pc, setPC] = useState(0)
+  const [pc, setPC] = useState(-1)
+  const [addresses, setAddresses] = useState<ReturnType<typeof parse>>([])
+  const [pcMax, setPcMax] = useState(0)
+  const [sets, setSets] = useState<ReturnType<typeof initSet>>([])
 
-  const trace = parse(s, b, getTrace(selectedExample))
+  function run(pc: number) {
+    if (!selectedExample) {
+      return
+    }
+
+    const sets = initSet({ s, E })
+    const addresses = parse(s, b, getTrace(selectedExample))
+    const newCache = nextCache({
+      pc,
+      E,
+      s,
+      b,
+      oldSets: sets,
+      addresses,
+    })
+    if (newCache.addresses[pc - 1]?.instruction === 'M') {
+      const newCache2 = nextCache({
+        pc,
+        E,
+        s,
+        b,
+        oldSets: newCache.newSets,
+        addresses: newCache.addresses,
+      })
+      setSets(() => newCache2.newSets)
+      setAddresses(() => newCache2.addresses)
+      setPcMax(() => addresses.length)
+      return
+    }
+
+    setSets(() => newCache.newSets)
+    setAddresses(() => newCache.addresses)
+    setPcMax(() => addresses.length)
+  }
 
   function handleChange_s(values: number[]) {
     setS(() => values[0])
+    run(pc)
   }
+
   function handleChange_E(values: number[]) {
     setE(() => values[0])
+    run(pc)
   }
 
   function handleChange_b(values: number[]) {
     setb(() => values[0])
+    run(pc)
   }
 
   function handleChangeWord(value: string) {
     setWord(() => Number(value))
+    run(pc)
   }
+
   function handleChangeSelectedExampe(name: string) {
     setSelectedExample(() => name)
+    run(0)
+  }
+
+  function handleChangePC(values: number[]) {
+    setPC(() => values[0])
+    run(values[0])
   }
 
   const S = 1 << s
@@ -107,7 +169,7 @@ export function App() {
                 </div>
                 <Slider
                   step={1}
-                  min={1}
+                  min={0}
                   max={10}
                   value={[s]}
                   onValueChange={handleChange_s}
@@ -162,11 +224,22 @@ export function App() {
             </CardHeader>
           </Card>
         </div>
-        <div>
-          <TraceView trace={trace} pc={pc} s={s} b={b} word={word} />
+        <div className="flex flex-col gap-4">
+          <div id="controls" className="flex gap-4">
+            Run{' '}
+            <Slider
+              min={0}
+              max={pcMax}
+              step={1}
+              value={[pc]}
+              onValueChange={handleChangePC}
+            />
+          </div>
+          <TraceView trace={addresses} pc={pc} s={s} b={b} word={word} />
           <CacheView
-            trace={trace}
-            filename={selectedExample}
+            addresses={addresses}
+            sets={sets}
+            pc={pc}
             E={E}
             s={s}
             b={b}

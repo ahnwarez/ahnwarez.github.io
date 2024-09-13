@@ -34,7 +34,17 @@ export function parse(s: number, b: number, text: string) {
     const setIndex = (BigInt(address) >> BigInt(b)) & ((1n << BigInt(s)) - 1n)
     const tag = BigInt(address) >> BigInt(s + b)
     const B = BigInt(address) & ((1n << BigInt(b)) - 1n)
-    addresses.push({ i, instruction, address, tag, setIndex, B })
+    addresses.push({
+      i,
+      instruction,
+      address,
+      tag,
+      setIndex,
+      B,
+      hit: 0,
+      miss: 0,
+      eviction: 0,
+    })
     i++
   }
 
