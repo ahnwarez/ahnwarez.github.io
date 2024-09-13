@@ -8,7 +8,7 @@ import { useState } from 'react'
 import { TraceView } from './components/traceView'
 import { CacheView } from './components/cacheView'
 import { getTrace, parse } from './traces'
-import { BlockStates, nextCache } from './cache'
+import { BlockStates, makeCache, Sets } from './cache'
 
 export function initSet({ s, E }: { s: number; E: number }) {
   return Array(2 ** s)
@@ -30,44 +30,27 @@ export function App() {
   const [s, setS] = useState(4)
   const [E, setE] = useState(1)
   const [b, setb] = useState(4)
-  const [pc, setPC] = useState(-1)
+  const [pc, setPC] = useState(0)
   const [addresses, setAddresses] = useState<ReturnType<typeof parse>>([])
-  const [pcMax, setPcMax] = useState(0)
-  const [sets, setSets] = useState<ReturnType<typeof initSet>>([])
+  const [sets, setSets] = useState<Sets>([])
 
   function run(pc: number) {
-    if (!selectedExample) {
-      return
+    const cache = makeCache({ s, E, b })
+    for (let i = 0; i < addresses.length && i < pc; i++) {
+      const address = addresses[i]
+      const { hit, miss, eviction } = cache.access(address.address)
+      address.hit += hit
+      address.miss += miss
+      address.eviction += eviction
+      if (address.instruction === 'M') {
+        const { hit, miss, eviction } = cache.access(address.address)
+        address.hit += hit
+        address.miss += miss
+        address.eviction += eviction
+      }
     }
 
-    const sets = initSet({ s, E })
-    const addresses = parse(s, b, getTrace(selectedExample))
-    const newCache = nextCache({
-      pc,
-      E,
-      s,
-      b,
-      oldSets: sets,
-      addresses,
-    })
-    if (newCache.addresses[pc - 1]?.instruction === 'M') {
-      const newCache2 = nextCache({
-        pc,
-        E,
-        s,
-        b,
-        oldSets: newCache.newSets,
-        addresses: newCache.addresses,
-      })
-      setSets(() => newCache2.newSets)
-      setAddresses(() => newCache2.addresses)
-      setPcMax(() => addresses.length)
-      return
-    }
-
-    setSets(() => newCache.newSets)
-    setAddresses(() => newCache.addresses)
-    setPcMax(() => addresses.length)
+    setSets(() => cache.sets)
   }
 
   function handleChange_s(values: number[]) {
@@ -92,7 +75,14 @@ export function App() {
 
   function handleChangeSelectedExampe(name: string) {
     setSelectedExample(() => name)
-    run(0)
+    if (!selectedExample) {
+      return
+    }
+
+    const trace = getTrace(selectedExample)
+    const addresses = parse(s, b, trace)
+
+    setAddresses(() => addresses)
   }
 
   function handleChangePC(values: number[]) {
@@ -226,11 +216,11 @@ export function App() {
           </Card>
         </div>
         <div className="flex flex-col gap-4">
-          <div id="controls" className="flex gap-4">
+          <div id="controls" className="flex gap-4 w-1/4">
             Run{' '}
             <Slider
               min={0}
-              max={pcMax}
+              max={addresses.length}
               step={1}
               value={[pc]}
               onValueChange={handleChangePC}

@@ -1,10 +1,8 @@
 import { parse } from '../traces'
-import { initSet } from '../App'
 import clsx from 'clsx'
-import { BlockStates } from '../cache'
+import { BlockStates, Sets } from '../cache'
 
 type Addresses = ReturnType<typeof parse>
-type Set = ReturnType<typeof initSet>
 
 interface CacheViewProps {
   word: number
@@ -14,7 +12,7 @@ interface CacheViewProps {
   E: number
   pc: number
   addresses: Addresses
-  sets: ReturnType<typeof initSet>
+  sets: Sets
 }
 
 export function CacheView({ addresses, s, b, word, sets }: CacheViewProps) {
@@ -57,7 +55,7 @@ export function CacheView({ addresses, s, b, word, sets }: CacheViewProps) {
                   <span className="text-amber-600">
                     {line.tag.toString(2).padStart(word - (s + b), '0')}
                   </span>
-                  <div className="flex ml-4 border bg-muted">
+                  {/* <div className="flex ml-4 border bg-muted">
                     {Array.from({ length: b }, (_, i) => BigInt(i)).map(
                       (current) => (
                         <div
@@ -70,7 +68,7 @@ export function CacheView({ addresses, s, b, word, sets }: CacheViewProps) {
                         ></div>
                       ),
                     )}
-                  </div>
+                  </div>*/}
                 </div>
               ))}
             </div>
