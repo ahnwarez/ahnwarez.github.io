@@ -8,7 +8,7 @@ import { useState } from 'react'
 import { TraceView } from './components/traceView'
 import { CacheView } from './components/cacheView'
 import { getTrace, parse } from './traces'
-import { nextCache } from './cache'
+import { BlockStates, nextCache } from './cache'
 
 export function initSet({ s, E }: { s: number; E: number }) {
   return Array(2 ** s)
@@ -19,6 +19,7 @@ export function initSet({ s, E }: { s: number; E: number }) {
         .map(() => ({
           valid: false,
           tag: 0n,
+          blockIndex: { index: 0n, state: BlockStates.Empty },
         })),
     )
 }

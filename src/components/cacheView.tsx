@@ -1,7 +1,10 @@
 import { parse } from '../traces'
 import { initSet } from '../App'
+import clsx from 'clsx'
+import { BlockStates } from '../cache'
 
 type Addresses = ReturnType<typeof parse>
+type Set = ReturnType<typeof initSet>
 
 interface CacheViewProps {
   word: number
@@ -14,7 +17,7 @@ interface CacheViewProps {
   sets: ReturnType<typeof initSet>
 }
 
-export function CacheView({ addresses, s, b, word, B, sets }: CacheViewProps) {
+export function CacheView({ addresses, s, b, word, sets }: CacheViewProps) {
   const summary = addresses.reduce(
     (acc, v) => ({
       hits: acc.hits + v.hit,
@@ -41,9 +44,9 @@ export function CacheView({ addresses, s, b, word, B, sets }: CacheViewProps) {
             <p className="w-24 text-green-600">
               {i.toString(2).padStart(s, '0')}
             </p>
-            <div id="line">
+            <div id="lines">
               {lines.map((line, i) => (
-                <div id="line" className="space-x-2" key={i}>
+                <div id="line" className="flex gap-x-2 items-center" key={i}>
                   <span
                     className={
                       line.valid ? 'text-foreground' : 'text-muted-foreground'
@@ -54,7 +57,20 @@ export function CacheView({ addresses, s, b, word, B, sets }: CacheViewProps) {
                   <span className="text-amber-600">
                     {line.tag.toString(2).padStart(word - (s + b), '0')}
                   </span>
-                  <span className="text-muted-foreground">{B} bytes</span>
+                  <div className="flex ml-4 border bg-muted">
+                    {Array.from({ length: b }, (_, i) => BigInt(i)).map(
+                      (current) => (
+                        <div
+                          className={clsx(
+                            'w-10 h-10',
+                            Number(current) === Number(line.blockIndex.index)
+                              ? getColorState(line.blockIndex.state)
+                              : '',
+                          )}
+                        ></div>
+                      ),
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -63,4 +79,10 @@ export function CacheView({ addresses, s, b, word, B, sets }: CacheViewProps) {
       </div>
     </div>
   )
+}
+
+function getColorState(state: Set[number][number]['blockIndex']['state']) {
+  if (state === BlockStates.Valid) return 'bg-primary'
+  else if (state === BlockStates.Evicted) return 'bg-primary opacity-50'
+  else return ''
 }
