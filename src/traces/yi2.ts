@@ -1,4 +1,4 @@
- L 0,1
+export const yi2 = ` L 0,1
  L 1,1
  L 2,1
  L 3,1
@@ -13,4 +13,4 @@
  S c,1
  L d,1
  S e,1
- M f,1
+ M f,1`
