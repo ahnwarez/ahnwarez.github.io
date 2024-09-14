@@ -111,23 +111,7 @@ export function App() {
           </Button>
         </div>
       </div>
-      <div className="flex flex-col-reverse justify-between gap-4 p-2">
-        <div className="col-span-10 border-t m-2 grid grid-flow-col gap-2 overflow-y-auto pt-4">
-          <div>
-            <TraceView trace={program} pc={pc} s={s} b={b} word={word} />
-          </div>
-          <div className="border-l w-full pl-4">
-            <CacheView
-              sets={cache.sets}
-              pc={pc}
-              E={E}
-              s={s}
-              b={b}
-              B={B}
-              word={word}
-            />
-          </div>
-        </div>
+      <div className="flex flex-col justify-between gap-4 p-2">
         <div className="flex gap-2 justify-between items-center w-1/8">
           <div className="space-y-2">
             <label>Word size</label>
@@ -214,6 +198,27 @@ export function App() {
               {' '}
               <DoubleArrowRightIcon />
             </Button>
+          </div>
+        </div>
+        <div className="flex gap-2 flex-col">
+          <p className="text-muted-foreground">
+            C = S * E * B <br />C = {S} * {E} * {B} = {C} bytes{' '}
+          </p>
+        </div>
+        <div className="col-span-10 border-t m-2 grid grid-flow-col gap-2 overflow-y-auto pt-4">
+          <div>
+            <TraceView trace={program} pc={pc} s={s} b={b} word={word} />
+          </div>
+          <div className="border-l w-full pl-4">
+            <CacheView
+              sets={cache.sets}
+              pc={pc}
+              E={E}
+              s={s}
+              b={b}
+              B={B}
+              word={word}
+            />
           </div>
         </div>
       </div>
