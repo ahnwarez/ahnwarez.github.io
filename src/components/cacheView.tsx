@@ -13,49 +13,38 @@ interface CacheViewProps {
 
 export function CacheView({ s, b, word, sets }: CacheViewProps) {
   return (
-    <div className="flex flex-col">
-      <div
-        id="sets"
-        className="grid grid-cols-4 bg-card rounded-lg p-4 text-sm font-mono"
-      >
-        {sets.map((lines, i) => (
-          <div key={i} className="flex gap-x-8 items-center border p-2 m-2">
-            <p className="w-24 text-green-600">
-              {i.toString(2).padStart(s, '0')}
-            </p>
-            <div id="lines">
-              {lines.map((line, i) => (
-                <div id="line" className="flex gap-x-2 items-center" key={i}>
-                  <span
-                    className={
-                      line.valid ? 'text-foreground' : 'text-muted-foreground'
-                    }
-                  >
-                    {line.valid ? '1' : '0'}
-                  </span>
-                  <span className="text-amber-600">
-                    {line.tag.toString(2).padStart(word - (s + b), '0')}
-                  </span>
-                  <div className="flex ml-4 border bg-muted">
-                    {Array.from({ length: b }, (_, i) => BigInt(i)).map(
-                      (current) => (
-                        <div
-                          className={clsx(
-                            'w-10 h-10',
-                            Number(current) === Number(line.blockIndex)
-                              ? getColorState(line.state)
-                              : '',
-                          )}
-                        ></div>
-                      ),
-                    )}
-                  </div>
+    <div id="sets" className="flex flex-col text-sm font-mono gap-1">
+      {sets.map((lines, i) => (
+        <div key={i} className="flex items-center divide">
+          <p className=" text-green-600">{i.toString(2).padStart(s, '0')}</p>
+          <div id="lines">
+            {lines.map((line, i) => (
+              <div id="line" className="flex gap-x-2 items-center" key={i}>
+                <span className="text-amber-600">
+                  {line.tag.toString(2).padStart(word - (s + b), '0')}
+                </span>
+                <div className="flex ml-2 bg-muted">
+                  {Array.from({ length: b }, (_, i) => BigInt(i)).map(
+                    (current) => (
+                      <div
+                        className={clsx(
+                          'w-10 h-10 border border-background text-center flex items-center justify-center',
+                          line.valid ? 'bg-primary' : '',
+                        )}
+                      >
+                        {Number(current) === Number(line.blockIndex) &&
+                          line.valid
+                          ? '×'
+                          : ''}
+                      </div>
+                    ),
+                  )}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   )
 }

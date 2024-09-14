@@ -32,8 +32,8 @@ export function TraceView({ s, b, pc, word, trace }: TraceProps) {
         <TableRow>
           <TableHead>{''}</TableHead>
           <TableHead>Inst.</TableHead>
-          <TableHead>Address (Hex)</TableHead>
-          <TableHead>Address (Binary)</TableHead>
+          <TableHead>Adrs.</TableHead>
+          <TableHead>Adrs.</TableHead>
           <TableHead>Hits</TableHead>
           <TableHead>Misses</TableHead>
           <TableHead>Evictions</TableHead>

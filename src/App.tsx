@@ -4,13 +4,17 @@ import { Button } from './components/ui/button'
 import { Slider } from './components/ui/slider'
 import { Label } from './components/ui/label'
 import { RadioGroup, RadioGroupItem } from './components/ui/radio-group'
-
-import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card'
-import { TraceView } from './components/traceView'
 import { CacheView } from './components/cacheView'
 
 import { getProgramString, parse } from './program'
 import { makeCache } from './cache'
+import { TraceView } from './components/traceView'
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DoubleArrowLeftIcon,
+  DoubleArrowRightIcon,
+} from '@radix-ui/react-icons'
 
 export function App() {
   const [selectedExample, setSelectedExample] = useState<string>('yi')
@@ -77,141 +81,140 @@ export function App() {
   }
 
   return (
-    <div className="p-4 text-xl">
-      <div className="flex flex-col gap-y-4">
-        <div className="space-y-4">
-          <div className="space-x-4">
-            <Button
-              variant="link"
-              onClick={() => handleChangeSelectedExampe('yi')}
-            >
-              yi.trace
-            </Button>
-            <Button
-              variant="link"
-              onClick={() => handleChangeSelectedExampe('yi2')}
-            >
-              yi2.trace
-            </Button>
-            <Button
-              variant="link"
-              onClick={() => handleChangeSelectedExampe('trans')}
-            >
-              trans.trace
-            </Button>
-            <Button
-              variant="link"
-              onClick={() => handleChangeSelectedExampe('dave')}
-            >
-              dave.trace
-            </Button>
+    <div className="border m-4 rounded-xl flex flex-col">
+      <div className="border-b flex justify-between items-center">
+        <h1 className="pl-4 font-bold text-lg">Interactive Cache</h1>
+        <div className="space-x-4">
+          <Button
+            variant="link"
+            onClick={() => handleChangeSelectedExampe('yi')}
+          >
+            yi.trace
+          </Button>
+          <Button
+            variant="link"
+            onClick={() => handleChangeSelectedExampe('yi2')}
+          >
+            yi2.trace
+          </Button>
+          <Button
+            variant="link"
+            onClick={() => handleChangeSelectedExampe('trans')}
+          >
+            trans.trace
+          </Button>
+          <Button
+            variant="link"
+            onClick={() => handleChangeSelectedExampe('dave')}
+          >
+            dave.trace
+          </Button>
+        </div>
+      </div>
+      <div className="flex flex-col-reverse justify-between gap-4 p-2">
+        <div className="col-span-10 border-t m-2 grid grid-flow-col gap-2 overflow-y-auto pt-4">
+          <div>
+            <TraceView trace={program} pc={pc} s={s} b={b} word={word} />
+          </div>
+          <div className="border-l w-full pl-4">
+            <CacheView
+              sets={cache.sets}
+              pc={pc}
+              E={E}
+              s={s}
+              b={b}
+              B={B}
+              word={word}
+            />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <Card id="parameters">
-            <CardContent className="space-y-4 pt-4">
-              <div>
-                <label>Word size</label>
-                <RadioGroup
-                  className="flex"
-                  defaultValue={word.toString()}
-                  onValueChange={handleChangeWord}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="8" id="r8" />
-                    <Label htmlFor="r8">8</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="16" id="r16" />
-                    <Label htmlFor="r16">16</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="32" id="r32" />
-                    <Label htmlFor="r32">32</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="64" id="r64" />
-                    <Label htmlFor="r64">64</Label>
-                  </div>
-                </RadioGroup>
+        <div className="flex gap-2 justify-between items-center w-1/8">
+          <div className="space-y-2">
+            <label>Word size</label>
+            <RadioGroup
+              className="flex"
+              defaultValue={word.toString()}
+              onValueChange={handleChangeWord}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="8" id="r8" />
+                <Label htmlFor="r8">8</Label>
               </div>
-              <div className="flex flex-col gap-y-1">
-                <div className="flex justify-between">
-                  <label>s</label>
-                  {s}
-                </div>
-                <Slider
-                  step={1}
-                  min={0}
-                  max={10}
-                  value={[s]}
-                  onValueChange={handleChange_s}
-                />
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="16" id="r16" />
+                <Label htmlFor="r16">16</Label>
               </div>
-              <div className="flex flex-col gap-y-1">
-                <div className="flex justify-between">
-                  <label>E</label>
-                  {E}
-                </div>
-                <Slider
-                  step={1}
-                  min={1}
-                  max={10}
-                  value={[E]}
-                  onValueChange={handleChange_E}
-                />
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="32" id="r32" />
+                <Label htmlFor="r32">32</Label>
               </div>
-              <div className="flex flex-col gap-y-1">
-                <div className="flex justify-between">
-                  <label>b</label>
-                  {b}
-                </div>
-                <Slider
-                  step={1}
-                  min={1}
-                  max={10}
-                  value={[b]}
-                  onValueChange={handleChange_b}
-                />
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="64" id="r64" />
+                <Label htmlFor="r64">64</Label>
               </div>
-            </CardContent>
-          </Card>
-          <Card id="parameters">
-            <CardHeader>
-              <CardTitle>Cache size</CardTitle>
-              <CardContent className="text-muted-foreground">
-                <p>
-                  S = 2<sup>s</sup>
-                </p>
-                <p>E: number of cache lines</p>
-                <p>
-                  B = 2<sup>b</sup>
-                </p>
-                <div>
-                  <code>
-                    C = S * E * B ={' '}
-                    <span className="text-foreground">{C} bytes</span>
-                  </code>
-                </div>
-              </CardContent>
-            </CardHeader>
-          </Card>
-        </div>
-        <div className="flex flex-col gap-4">
-          <div id="controls" className="flex gap-4 w-1/4">
-            <Button onClick={handlePcInrcement}>+</Button>
-            <Button onClick={handlePcDecrement}>-</Button>
+            </RadioGroup>
           </div>
-          <TraceView trace={program} pc={pc} s={s} b={b} word={word} />
-          <CacheView
-            sets={cache.sets}
-            pc={pc}
-            E={E}
-            s={s}
-            b={b}
-            B={B}
-            word={word}
-          />
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <p>S (sets)</p>
+              <p className="text-muted-foreground">
+                2<sup>{s}</sup> = {1 << s}
+              </p>
+            </div>
+            <Slider
+              step={1}
+              min={0}
+              max={10}
+              value={[s]}
+              onValueChange={handleChange_s}
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <p>E (lines)</p>
+              <p className="text-muted-foreground">{E}</p>
+            </div>
+            <Slider
+              step={1}
+              min={1}
+              max={10}
+              value={[E]}
+              onValueChange={handleChange_E}
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <p>B (blocks)</p>
+              <p className="text-muted-foreground">
+                2<sup>{b}</sup> = {1 << b} bytes
+              </p>
+            </div>
+            <Slider
+              step={1}
+              min={1}
+              max={10}
+              value={[b]}
+              onValueChange={handleChange_b}
+            />
+          </div>
+          <div id="controls" className="flex gap-4">
+            <Button onClick={() => setPC(() => 0)}>
+              {' '}
+              <DoubleArrowLeftIcon />
+            </Button>
+            <Button onClick={handlePcDecrement}>
+              {' '}
+              <ChevronLeftIcon />
+            </Button>
+            <Button onClick={handlePcInrcement}>
+              {' '}
+              <ChevronRightIcon />
+            </Button>
+            <Button onClick={() => setPC(() => program.length)}>
+              {' '}
+              <DoubleArrowRightIcon />
+            </Button>
+          </div>
         </div>
       </div>
     </div>
