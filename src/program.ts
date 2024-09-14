@@ -1,22 +1,20 @@
+import { yi } from './traces/yi'
+import { yi2 } from './traces/yi2'
+import { dave } from './traces/dave'
+import { trans } from './traces/trans'
+
 export function getProgramString(exampleName: string) {
   const traceExamples = {
-    yi: ` L 10,1
- M 20,1
- L 22,1
- S 18,1
- L 110,1
- L 210,1
- M 12,1`,
-    yi2: ` L 50,1
- M 40,1
- L 32,1
- S 38,1
- L 40,1
- L 10,1
- M 32,1`,
+    yi,
+    yi2,
+    dave,
+    trans,
   } as const
 
-  return traceExamples[exampleName]
+  if (exampleName in traceExamples) {
+    return traceExamples[exampleName]
+  }
+  return null
 }
 
 export function parse(s: number, b: number, text: string) {
