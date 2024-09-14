@@ -1,28 +1,16 @@
+import { useState } from 'react'
+
 import { Button } from './components/ui/button'
 import { Slider } from './components/ui/slider'
 import { Label } from './components/ui/label'
 import { RadioGroup, RadioGroupItem } from './components/ui/radio-group'
 
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card'
-import { useState } from 'react'
 import { TraceView } from './components/traceView'
 import { CacheView } from './components/cacheView'
-import { getTrace, parse } from './traces'
-import { BlockStates, makeCache } from './cache'
 
-export function initSet({ s, E }: { s: number; E: number }) {
-  return Array(2 ** s)
-    .fill(() => 0)
-    .map(() =>
-      Array(E)
-        .fill(() => 0)
-        .map(() => ({
-          valid: false,
-          tag: 0n,
-          blockIndex: { index: 0n, state: BlockStates.Empty },
-        })),
-    )
-}
+import { getProgramString, parse } from './program'
+import { makeCache } from './cache'
 
 export function App() {
   const [selectedExample, setSelectedExample] = useState<string>('yi')
@@ -31,8 +19,6 @@ export function App() {
   const [E, setE] = useState(1)
   const [b, setb] = useState(4)
   const [pc, setPC] = useState(0)
-  // const [addresses, setAddresses] = useState<ReturnType<typeof parse>>([])
-  // const [sets, setSets] = useState<Sets>([])
 
   /*
    * derived states
@@ -41,11 +27,11 @@ export function App() {
   const B = 1 << b
   const C = S * E * B
 
-  const trace = getTrace(selectedExample)
-  const addresses = parse(s, b, trace)
+  const programText = getProgramString(selectedExample)
+  const program = parse(s, b, programText)
   const cache = makeCache({ s, E, b })
   for (let i = 0; i < pc; i++) {
-    const address = addresses[i]
+    const address = program[i]
     const { hit, miss, eviction } = cache.access(address.address)
     address.hit = hit
     address.miss = miss
@@ -211,15 +197,15 @@ export function App() {
             Run{' '}
             <Slider
               min={0}
-              max={addresses.length}
+              max={program.length}
               step={1}
               value={[pc]}
               onValueChange={handleChangePC}
             />
           </div>
-          <TraceView trace={addresses} pc={pc} s={s} b={b} word={word} />
+          <TraceView trace={program} pc={pc} s={s} b={b} word={word} />
           <CacheView
-            addresses={addresses}
+            addresses={program}
             sets={cache.sets}
             pc={pc}
             E={E}

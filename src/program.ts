@@ -1,4 +1,4 @@
-export function getTrace(exampleName: string) {
+export function getProgramString(exampleName: string) {
   const traceExamples = {
     yi: ` L 10,1
  M 20,1
@@ -16,8 +16,7 @@ export function getTrace(exampleName: string) {
  M 32,1`,
   } as const
 
-  const traceFound = traceExamples[exampleName]
-  return traceFound
+  return traceExamples[exampleName]
 }
 
 export function parse(s: number, b: number, text: string) {
