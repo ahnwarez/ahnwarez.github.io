@@ -1,8 +1,9 @@
-import { parse } from '../traces'
+import { parse } from '../program'
 import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -17,6 +18,14 @@ interface TraceProps {
 }
 
 export function TraceView({ s, b, pc, word, trace }: TraceProps) {
+  const summary = trace.reduce(
+    (acc, v) => ({
+      hits: acc.hits + v.hit,
+      misses: acc.misses + v.miss,
+      evictions: acc.evictions + v.eviction,
+    }),
+    { hits: 0, misses: 0, evictions: 0 },
+  )
   return (
     <Table>
       <TableHeader>
@@ -51,18 +60,25 @@ export function TraceView({ s, b, pc, word, trace }: TraceProps) {
                 {t.B.toString(2).padStart(b, '0')}
               </span>
             </TableCell>
-            <TableCell> {t.hit}</TableCell>
-            <TableCell> {t.miss}</TableCell>
-            <TableCell> {t.eviction}</TableCell>
+            <TableCell> {t.hit > 0 && '●'}</TableCell>
+            <TableCell> {t.miss > 0 && '●'}</TableCell>
+            <TableCell> {t.eviction > 0 && '●'}</TableCell>
           </TableRow>
         ))}
+      </TableBody>
+      <TableFooter>
         <TableRow>
           <TableCell className="text-foreground size-8">
             {trace.length === pc ? '→' : ''}
           </TableCell>
-          <TableCell className="text-zinc-600">End</TableCell>
+          <TableCell className="text-zinc-600">END</TableCell>
+          <TableCell className="text-zinc-600"></TableCell>
+          <TableCell className="text-zinc-600 text-right">TOTAL</TableCell>
+          <TableCell className="text-foreground">{summary.hits}</TableCell>
+          <TableCell className="text-foreground">{summary.misses}</TableCell>
+          <TableCell className="text-foreground">{summary.evictions}</TableCell>
         </TableRow>
-      </TableBody>
+      </TableFooter>
     </Table>
   )
 }

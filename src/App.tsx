@@ -195,7 +195,6 @@ export function App() {
           </div>
           <TraceView trace={program} pc={pc} s={s} b={b} word={word} />
           <CacheView
-            addresses={program}
             sets={cache.sets}
             pc={pc}
             E={E}
