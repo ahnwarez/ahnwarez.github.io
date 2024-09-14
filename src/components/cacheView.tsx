@@ -15,8 +15,10 @@ export function CacheView({ s, b, word, sets }: CacheViewProps) {
   return (
     <div id="sets" className="flex flex-col text-sm font-mono gap-1">
       {sets.map((lines, i) => (
-        <div key={i} className="flex items-center divide">
-          <p className=" text-green-600">{i.toString(2).padStart(s, '0')}</p>
+        <div key={i} className="flex flex-col bg-card rounded-lg gap-2 p-1">
+          <p className=" text-green-600">
+            Set: {i.toString(2).padStart(s, '0')}
+          </p>
           <div id="lines">
             {lines.map((line, i) => (
               <div id="line" className="flex gap-x-2 items-center" key={i}>
