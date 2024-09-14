@@ -41,7 +41,10 @@ export function TraceView({ s, b, pc, word, trace }: TraceProps) {
       </TableHeader>
       <TableBody className="font-mono">
         {trace.map((t, i) => (
-          <TableRow key={t.i}>
+          <TableRow
+            key={t.i}
+            className={i === pc ? 'font-extrabold' : 'font-normal'}
+          >
             <TableCell className="text-foreground size-8">
               {i === pc ? '→' : ''}
             </TableCell>
