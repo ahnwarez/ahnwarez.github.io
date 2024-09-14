@@ -46,7 +46,7 @@ export function TraceView({ s, b, pc, word, trace }: TraceProps) {
               {i === pc ? '→' : ''}
             </TableCell>
             <TableCell> {t.instruction}</TableCell>
-            <TableCell className="text-left">
+            <TableCell className="text-right">
               0x{t.address.toString(16)}
             </TableCell>
             <TableCell className="text-left">
@@ -60,9 +60,12 @@ export function TraceView({ s, b, pc, word, trace }: TraceProps) {
                 {t.B.toString(2).padStart(b, '0')}
               </span>
             </TableCell>
-            <TableCell> {t.hit > 0 && '●'}</TableCell>
-            <TableCell> {t.miss > 0 && '●'}</TableCell>
-            <TableCell> {t.eviction > 0 && '●'}</TableCell>
+            <TableCell className="text-center"> {t.hit > 0 && '●'}</TableCell>
+            <TableCell className="text-center"> {t.miss > 0 && '●'}</TableCell>
+            <TableCell className="text-center">
+              {' '}
+              {t.eviction > 0 && '●'}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
