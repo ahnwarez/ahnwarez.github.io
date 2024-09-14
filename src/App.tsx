@@ -67,10 +67,6 @@ export function App() {
     }
   }
 
-  function handleChangePC(values: number[]) {
-    setPC(() => values[0])
-  }
-
   return (
     <div className="p-4 text-xl">
       <div className="flex flex-col gap-y-4">
@@ -194,14 +190,8 @@ export function App() {
         </div>
         <div className="flex flex-col gap-4">
           <div id="controls" className="flex gap-4 w-1/4">
-            Run{' '}
-            <Slider
-              min={0}
-              max={program.length}
-              step={1}
-              value={[pc]}
-              onValueChange={handleChangePC}
-            />
+            <Button onClick={() => setPC((pc) => pc + 1)}>+</Button>
+            <Button onClick={() => setPC((pc) => pc - 1)}>-</Button>
           </div>
           <TraceView trace={program} pc={pc} s={s} b={b} word={word} />
           <CacheView
