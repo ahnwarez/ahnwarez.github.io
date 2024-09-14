@@ -8,7 +8,7 @@ import { useState } from 'react'
 import { TraceView } from './components/traceView'
 import { CacheView } from './components/cacheView'
 import { getTrace, parse } from './traces'
-import { BlockStates, makeCache, Sets } from './cache'
+import { BlockStates, makeCache } from './cache'
 
 export function initSet({ s, E }: { s: number; E: number }) {
   return Array(2 ** s)
@@ -25,52 +25,53 @@ export function initSet({ s, E }: { s: number; E: number }) {
 }
 
 export function App() {
-  const [selectedExample, setSelectedExample] = useState<string>()
+  const [selectedExample, setSelectedExample] = useState<string>('yi')
   const [word, setWord] = useState(16)
   const [s, setS] = useState(4)
   const [E, setE] = useState(1)
   const [b, setb] = useState(4)
   const [pc, setPC] = useState(0)
-  const [addresses, setAddresses] = useState<ReturnType<typeof parse>>([])
-  const [sets, setSets] = useState<Sets>([])
+  // const [addresses, setAddresses] = useState<ReturnType<typeof parse>>([])
+  // const [sets, setSets] = useState<Sets>([])
 
-  function run(pc: number) {
-    const cache = makeCache({ s, E, b })
-    for (let i = 0; i < addresses.length && i < pc; i++) {
-      const address = addresses[i]
+  /*
+   * derived states
+   **/
+  const S = 1 << s
+  const B = 1 << b
+  const C = S * E * B
+
+  const trace = getTrace(selectedExample)
+  const addresses = parse(s, b, trace)
+  const cache = makeCache({ s, E, b })
+  for (let i = 0; i < pc; i++) {
+    const address = addresses[i]
+    const { hit, miss, eviction } = cache.access(address.address)
+    address.hit = hit
+    address.miss = miss
+    address.eviction = eviction
+    if (address.instruction === 'M') {
       const { hit, miss, eviction } = cache.access(address.address)
       address.hit += hit
       address.miss += miss
       address.eviction += eviction
-      if (address.instruction === 'M') {
-        const { hit, miss, eviction } = cache.access(address.address)
-        address.hit += hit
-        address.miss += miss
-        address.eviction += eviction
-      }
     }
-
-    setSets(() => cache.sets)
   }
 
   function handleChange_s(values: number[]) {
     setS(() => values[0])
-    run(pc)
   }
 
   function handleChange_E(values: number[]) {
     setE(() => values[0])
-    run(pc)
   }
 
   function handleChange_b(values: number[]) {
     setb(() => values[0])
-    run(pc)
   }
 
   function handleChangeWord(value: string) {
     setWord(() => Number(value))
-    run(pc)
   }
 
   function handleChangeSelectedExampe(name: string) {
@@ -78,21 +79,11 @@ export function App() {
     if (!selectedExample) {
       return
     }
-
-    const trace = getTrace(selectedExample)
-    const addresses = parse(s, b, trace)
-
-    setAddresses(() => addresses)
   }
 
   function handleChangePC(values: number[]) {
     setPC(() => values[0])
-    run(values[0])
   }
-
-  const S = 1 << s
-  const B = 1 << b
-  const C = S * E * B
 
   return (
     <div className="p-4 text-xl">
@@ -229,7 +220,7 @@ export function App() {
           <TraceView trace={addresses} pc={pc} s={s} b={b} word={word} />
           <CacheView
             addresses={addresses}
-            sets={sets}
+            sets={cache.sets}
             pc={pc}
             E={E}
             s={s}
