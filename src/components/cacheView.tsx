@@ -1,4 +1,5 @@
-import { Sets } from '../cache'
+import clsx from 'clsx'
+import { BlockStates, Sets } from '../cache'
 
 interface CacheViewProps {
   word: number
@@ -35,6 +36,20 @@ export function CacheView({ s, b, word, sets }: CacheViewProps) {
                   <span className="text-amber-600">
                     {line.tag.toString(2).padStart(word - (s + b), '0')}
                   </span>
+                  <div className="flex ml-4 border bg-muted">
+                    {Array.from({ length: b }, (_, i) => BigInt(i)).map(
+                      (current) => (
+                        <div
+                          className={clsx(
+                            'w-10 h-10',
+                            Number(current) === Number(line.blockIndex)
+                              ? getColorState(line.state)
+                              : '',
+                          )}
+                        ></div>
+                      ),
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -43,4 +58,10 @@ export function CacheView({ s, b, word, sets }: CacheViewProps) {
       </div>
     </div>
   )
+}
+
+function getColorState(state: Sets[number][number]['state']) {
+  if (state === BlockStates.Valid) return 'bg-primary'
+  else if (state === BlockStates.Evicted) return 'bg-primary opacity-50'
+  else return ''
 }
