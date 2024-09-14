@@ -26,11 +26,11 @@ export function makeCache({ s, E, b }: { s: number; E: number; b: number }) {
   let misses = 0
   let evictions = 0
 
-  const sets = Array(2 ** s).fill(
-    Array(E).fill({
+  let sets = Array.from({ length: 2 ** s }).map(() =>
+    Array.from({ length: E }).map(() => ({
       valid: false,
       tag: 0n,
-    }),
+    })),
   )
 
   return Object.freeze({
