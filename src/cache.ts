@@ -50,7 +50,7 @@ export function makeCache({ s, E, b }: { s: number; E: number; b: number }) {
     const tag = BigInt(address) >> BigInt(s + b)
     const setNumber = Number(setIndex)
     const set = sets[setNumber]
-    const blockIndex = BigInt(address) & (1n << (BigInt(b) - 1n))
+    const blockIndex = BigInt(address) & ((1n << BigInt(b)) - 1n)
 
     // Check for hit
     for (let i = 0; i < set.length; i++) {
