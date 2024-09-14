@@ -67,6 +67,15 @@ export function App() {
     }
   }
 
+  function handlePcInrcement() {
+    setPC((oldState) =>
+      oldState < program.length ? oldState + 1 : program.length,
+    )
+  }
+  function handlePcDecrement() {
+    setPC((oldState) => (oldState > 0 ? oldState - 1 : 0))
+  }
+
   return (
     <div className="p-4 text-xl">
       <div className="flex flex-col gap-y-4">
@@ -190,8 +199,8 @@ export function App() {
         </div>
         <div className="flex flex-col gap-4">
           <div id="controls" className="flex gap-4 w-1/4">
-            <Button onClick={() => setPC((pc) => pc + 1)}>+</Button>
-            <Button onClick={() => setPC((pc) => pc - 1)}>-</Button>
+            <Button onClick={handlePcInrcement}>+</Button>
+            <Button onClick={handlePcDecrement}>-</Button>
           </div>
           <TraceView trace={program} pc={pc} s={s} b={b} word={word} />
           <CacheView
