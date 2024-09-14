@@ -112,7 +112,7 @@ export function App() {
         </div>
       </div>
       <div className="flex flex-col justify-between gap-4 p-2">
-        <div className="flex gap-2 justify-between items-center w-1/8">
+        <div className="flex gap-2 justify-between items-center w-1/8 sticky top-2 bg-card z-20 p-4">
           <div className="space-y-2">
             <label>Word size</label>
             <RadioGroup
