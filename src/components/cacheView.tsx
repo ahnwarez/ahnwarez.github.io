@@ -15,7 +15,7 @@ export function CacheView({ s, b, word, sets }: CacheViewProps) {
     <div className="flex flex-col">
       <div
         id="sets"
-        className="flex flex-col bg-card rounded-lg p-4 text-sm font-mono"
+        className="grid grid-cols-4 bg-card rounded-lg p-4 text-sm font-mono"
       >
         {sets.map((lines, i) => (
           <div key={i} className="flex gap-x-8 items-center border p-2 m-2">
