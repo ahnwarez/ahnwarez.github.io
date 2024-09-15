@@ -6,7 +6,7 @@ import { Label } from './components/ui/label'
 import { RadioGroup, RadioGroupItem } from './components/ui/radio-group'
 import { CacheView } from './components/cacheView'
 
-import { getProgramString, parse } from './program'
+import { Filename, getProgramString, parse } from './program'
 import { makeCache } from './cache'
 import { TraceView } from './components/traceView'
 import {
@@ -17,7 +17,7 @@ import {
 } from '@radix-ui/react-icons'
 
 export function App() {
-  const [selectedExample, setSelectedExample] = useState<string>('yi')
+  const [selectedExample, setSelectedExample] = useState<Filename>('yi')
   const [word, setWord] = useState(16)
   const [s, setS] = useState(4)
   const [E, setE] = useState(1)
@@ -64,7 +64,7 @@ export function App() {
     setWord(() => Number(value))
   }
 
-  function handleChangeSelectedExampe(name: string) {
+  function handleChangeSelectedExampe(name: Filename) {
     setSelectedExample(() => name)
     if (!selectedExample) {
       return

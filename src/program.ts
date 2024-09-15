@@ -3,7 +3,9 @@ import { yi2 } from './traces/yi2'
 import { dave } from './traces/dave'
 import { trans } from './traces/trans'
 
-export function getProgramString(exampleName: string) {
+export type Filename = 'yi' | 'yi2' | 'dave' | 'trans'
+
+export function getProgramString(exampleName: Filename) {
   const traceExamples = {
     yi,
     yi2,
@@ -11,10 +13,7 @@ export function getProgramString(exampleName: string) {
     trans,
   } as const
 
-  if (exampleName in traceExamples) {
-    return traceExamples[exampleName]
-  }
-  return null
+  return traceExamples[exampleName]
 }
 
 export function parse(s: number, b: number, text: string) {
