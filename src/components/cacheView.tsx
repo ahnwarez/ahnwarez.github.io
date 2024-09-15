@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { BlockStates, Sets } from '../cache'
+import { Sets } from '../cache'
 
 interface CacheViewProps {
   word: number
@@ -49,10 +49,4 @@ export function CacheView({ s, b, word, sets }: CacheViewProps) {
       ))}
     </div>
   )
-}
-
-function getColorState(state: Sets[number][number]['state']) {
-  if (state === BlockStates.Valid) return 'bg-primary'
-  else if (state === BlockStates.Evicted) return 'bg-primary opacity-50'
-  else return ''
 }
