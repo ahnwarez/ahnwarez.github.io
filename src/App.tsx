@@ -83,7 +83,13 @@ export function App() {
   return (
     <div className="border m-4 rounded-xl flex flex-col">
       <div className="border-b flex justify-between items-center">
-        <h1 className="pl-4 font-bold text-lg">Interactive Cache</h1>
+        <div className="p-4">
+          <h1 className="font-bold text-lg">Interactive Cachelab</h1>
+          <p className="text-muted-foreground">
+            A visualisation of the cachelab exercise from the Computer Systems:
+            A Programmer&apos;s Perspective book.
+          </p>
+        </div>
         <div className="space-x-4">
           <Button
             variant="link"
@@ -111,8 +117,8 @@ export function App() {
           </Button>
         </div>
       </div>
-      <div className="flex flex-col justify-between gap-4 p-2">
-        <div className="flex gap-2 justify-between items-center w-1/8 sticky top-2 bg-card z-20 p-4">
+      <div className="flex flex-col justify-between">
+        <div className="flex gap-2 justify-between items-center w-1/8 sticky top-0 bg-card z-20 p-4">
           <div className="space-y-2">
             <label>Word size</label>
             <RadioGroup
@@ -200,16 +206,19 @@ export function App() {
             </Button>
           </div>
         </div>
-        <div className="flex gap-2 flex-col">
-          <p className="text-muted-foreground">
-            C = S * E * B <br />C = {S} * {E} * {B} = {C} bytes{' '}
-          </p>
-        </div>
-        <div className="col-span-10 border-t m-2 grid grid-flow-col gap-2 overflow-y-auto pt-4">
+        <div className="flex gap-2 flex-col"></div>
+        <div className="col-span-10 m-2 grid grid-flow-col gap-2 overflow-y-auto pt-4">
           <div>
+            <p className="uppercase mb-6">Valgrind trace</p>
             <TraceView trace={program} pc={pc} s={s} b={b} word={word} />
           </div>
           <div className="border-l w-full pl-4">
+            <div className="flex justify-between">
+              <p className="uppercase">Cache state</p>
+              <p className="text-muted-foreground">
+                C = S * E * B <br />C = {S} * {E} * {B} = {C} bytes{' '}
+              </p>
+            </div>
             <CacheView
               sets={cache.sets}
               pc={pc}
